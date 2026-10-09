@@ -515,4 +515,63 @@ HAVING  AVG(f.total_fare_zar) > (
             WHERE  t2.trip_status = 'COMPLETED'
         )
 ORDER BY avg_fare_zar DESC;
- 
+
+
+/* =============================================================================
+6.11 Supporting Query: Transaction Example
+============================================================================= */
+-- Choose an existing trip with a toll charge
+SET @trip_to_correct = (
+    SELECT trip_id
+    FROM trip_fare_breakdown
+    WHERE tolls_zar > 0
+      AND total_fare_zar >= tolls_zar
+    ORDER BY trip_id
+    LIMIT 1
+);
+
+-- Store the original toll amount
+SET @original_toll = (
+    SELECT tolls_zar
+    FROM trip_fare_breakdown
+    WHERE trip_id = @trip_to_correct
+);
+
+START TRANSACTION;
+
+-- Step 1: Show the original record
+SELECT
+    trip_id,
+    tolls_zar,
+    total_fare_zar
+FROM trip_fare_breakdown
+WHERE trip_id = @trip_to_correct;
+
+-- Step 2: Correct the toll and keep the total fare consistent
+UPDATE trip_fare_breakdown
+SET
+    tolls_zar = 0.00,
+    total_fare_zar = total_fare_zar - @original_toll
+WHERE trip_id = @trip_to_correct;
+
+-- Step 3: Verify the temporary change
+SELECT
+    trip_id,
+    tolls_zar,
+    total_fare_zar
+FROM trip_fare_breakdown
+WHERE trip_id = @trip_to_correct;
+
+-- Step 4: Reverse the demonstration change
+ROLLBACK;
+
+-- Step 5: Confirm that the original values were restored
+SELECT
+    trip_id,
+    tolls_zar,
+    total_fare_zar
+FROM trip_fare_breakdown
+WHERE trip_id = @trip_to_correct;
+
+-- If this were a real, verified correction that must be saved,
+-- COMMIT would be used instead of ROLLBACK.
