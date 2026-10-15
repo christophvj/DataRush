@@ -51,7 +51,6 @@ IGNORE 1 ROWS
  
 -- ---------------------------------------------------------
 -- 5. trip_headers  (depends on sa_riders, sa_drivers, pricing_surge_zones)
---    cancellation_reason is the text 'N/A' on completed trips -> convert to NULL
 -- ---------------------------------------------------------
 LOAD DATA LOCAL INFILE 'C:/Users/chris/OneDrive/Desktop/uber_bolt_sa_dataset/trip_headers.csv'
 INTO TABLE trip_headers
@@ -88,7 +87,7 @@ IGNORE 1 ROWS
  
  
 -- ---------------------------------------------------------
--- Sanity check: row counts should be 1200 / 800 / 9 / 800 / 50000 / 50000 / 25055
+-- Successful import check: row counts should be 1200 / 800 / 9 / 800 / 50000 / 50000 / 25055
 -- ---------------------------------------------------------
 SELECT 'sa_riders' t, COUNT(*) row_count FROM sa_riders
 UNION ALL SELECT 'sa_drivers', COUNT(*) FROM sa_drivers
