@@ -1,6 +1,6 @@
 SET GLOBAL local_infile = 1;
  
- 
+ -- Replace INFILE Path with your OWN Path to CSV files
 -- ---------------------------------------------------------
 -- 1. sa_riders
 -- ---------------------------------------------------------
